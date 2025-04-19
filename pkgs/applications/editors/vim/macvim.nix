@@ -150,6 +150,11 @@ stdenv.mkDerivation (finalAttrs: {
   # "LDFLAGS=-headerpad_max_install_names" flag to configureFlags and either patch it into the
   # Xcode project or pass it as a flag to xcodebuild as well.
   postConfigure = ''
+    # This is certainly not the right way to add this LDFLAGS, but something seems to be clobbering
+    # the configureFlags before they are finalized with the `-headerpad_max_install_names`.  This at
+    # least gets things working through the `install_name_tool` calls.
+    sed -i -e '/LDFLAGS/s/$/ -headerpad_max_install_names/' src/auto/config.mk
+
     substituteInPlace src/auto/config.mk \
       --replace " -L${stdenv.cc.libc}/lib" "" \
       --replace " -L${darwin.libobjc}/lib" "" \
@@ -200,6 +205,10 @@ stdenv.mkDerivation (finalAttrs: {
 
     # Remove manpages from tools we aren't providing
     find $out/Applications/MacVim.app/Contents/man -name evim.1 -delete
+
+    # Remove dangling symlinks - the line above removes destinations of some already created links
+    # This is an aggressive strategy to clean that up.
+    find $out/Applications/MacVim.app/Contents/man -xtype l -exec rm -v {} +
   '';
 
   # We rely on the user's Xcode install to build. It may be located in an arbitrary place, and
