@@ -93,6 +93,7 @@ stdenv.mkDerivation (finalAttrs: {
   postPatch = ''
     echo "Patching file src/MacVim/MacVim.xcodeproj/project.pbxproj"
     sed -e '/Sparkle\.framework/d' -i src/MacVim/MacVim.xcodeproj/project.pbxproj
+    sed -e '/^\([[:space:]]*\)PRODUCT_NAME\ =\ MacVim/a \1OTHER_LDFLAGS="-headerpad_max_install_names";' -i src/MacVim/MacVim.xcodeproj/project.pbxproj
   '';
 
   # This is unfortunate, but we need to use the same compiler as Xcode, but Xcode doesn't provide a
