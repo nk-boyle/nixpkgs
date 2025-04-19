@@ -84,6 +84,7 @@ stdenv.mkDerivation (finalAttrs: {
     "--with-tlib=ncurses"
     "--with-compiledby=Nix"
     "--disable-sparkle"
+    "LDFLAGS=-headerpad_max_install_names"
   ];
 
   # Remove references to Sparkle.framework from the project.
